@@ -1,9 +1,7 @@
-word_doc = "google-10000-english-no-swears.txt"
-
 class Hangman
   def initialize() 
   word_doc = "google-10000-english-no-swears.txt"  
-  @keyword = pick_keyword(word_doc).chomp
+  @keyword = pick_keyword(word_doc)
   @keyword_length = @keyword.length()
   @keyword_array = @keyword.split("")
   @guess_array = []
@@ -27,18 +25,13 @@ class Hangman
 
   def pick_keyword(file)
     while true 
-      keyword = File.readlines(file).sample
-      keyword_length = keyword_length(keyword)
-      if keyword_length > 4 && keyword_length < 13
+      keyword = File.readlines(file).sample.chomp
+      if keyword.length > 4 && keyword.length < 13
         return keyword
       else
         next
       end
     end
-  end
-
-  def keyword_length(keyword)
-    keyword.chomp.length
   end
 
   def invalid_guess
@@ -57,7 +50,7 @@ class Hangman
     @guess_array.append(@guess)
   end
 
-  def validate_guess() #add validate for guess array??
+  def validate_guess() 
     if @guess.length == 1 && @guess.match?(/[[:alpha:]]/) && @guess_array.include?(@guess) == false
       used_guess
     else
@@ -65,7 +58,7 @@ class Hangman
     end
   end
 
-  def check_guess() #double duty for keyword_array and guess_array
+  def check_guess() 
     @keyword_array.include?(@guess)
   end
 
@@ -113,34 +106,3 @@ game = Hangman.new()
 game.play()
 
 
-#masked_array = mask_keyword(keyword_length)
-#guess = get_guess
-#foo = used_guess(guess, guess_array)
-#check_guess(guess, keyword_array)
-#puts keyword
-#puts "keyword array" + "#{keyword_array}"
-#puts "#{mask_keyword(keyword_length)}"
-#puts "masked array" + "#{update_masked_array(keyword_array, guess, masked_array)}"
-
-
-
-
-
-
-
-#get keyword > keyword_length > keyword_array (keyword class?????)
-
-#if win condition not met ( keyword_array == [] ) || max turns reached ()
-
-#display masked keyword
-
-#get player guess > validate guess > add to guess array > check guess 
-
-#if check_guess true > 
-  #keyword_array each with index 
-  #for every match remove value from kwdarry and overwrite in masked array at correct index
-  #advance turn counter
-#false 
-  #advance turn counter
-  #show guess array
-  
