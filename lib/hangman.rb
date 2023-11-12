@@ -6,9 +6,23 @@ class Hangman
   @keyword_length = keyword_length(@keyword)
   @keyword_array = @keyword.split("")
   @guess_array = []
+  @masked_array = mask_keyword()
   @guess = nil
   end
   
+  def show_turns_left()
+    puts "You have #{@turns} choices remaining" + "\n" + "\n"
+  end
+
+  def show_masked_array()
+    puts "#{@masked_array}" + "\n" + "\n"
+  end
+
+  def show_guess_array()
+    puts " Used guesses:" + "\n"
+    puts "#{@guess_array}"
+  end
+
   def pick_keyword(file)
     while true 
       keyword = File.readlines(file).sample
@@ -25,48 +39,88 @@ class Hangman
     keyword.chomp.length
   end
 
+  def invalid_guess
+    puts " invalid guess"
+    get_guess
+  end
+
   def get_guess() 
     puts "Please make a guess: "
     @guess = gets.downcase.chomp
+    puts "\n"
     validate_guess()
   end
 
   def used_guess()
     @guess_array.append(@guess)
-    puts "#{@guess_array}"
   end
 
   def validate_guess() #add validate for guess array??
-    if @guess.length == 1 && @guess.match?(/[[:alpha:]]/)
-      used_guess()
+    if @guess.length == 1 && @guess.match?(/[[:alpha:]]/) && @guess_array.include?(@guess) == false
+      used_guess
     else
-      puts "invalid guess"
-      get_guess()
+      invalid_guess
     end
   end
 
-  def check_guess(guess, array) #double duty for keyword_array and guess_array
-    array.include?(guess)
+  def check_guess() #double duty for keyword_array and guess_array
+    @keyword_array.include?(@guess)
   end
     
-
-  def mask_keyword(keyword_length)
-    Array.new(keyword_length, "_")
+  def mask_keyword()
+    Array.new(@keyword_length, "_")
   end
 
-
-  def update_masked_array(keyword_array, guess, masked_array)
-    keyword_array.each_with_index {|letter, index|
-      if letter == guess 
-        keyword_array - [index]
-        masked_array[index] = guess
+  def update_masked_array()
+    @keyword_array.each_with_index {|letter, index|
+      if letter == @guess 
+        @masked_array[index] = @guess 
     end }
-    return masked_array
   end
+
+  def win()
+    unless @masked_array.include?("_")
+      true
+    else
+      false
+    end
+  end
+
+  def lose()
+    if @turns == 0
+      true
+    end
+  end
+
+  def play()
+    turns = 8
+    while win == false
+      if turns == 0 
+        abort "you lose"
+      else 
+        show_turns_left
+        show_masked_array
+        get_guess
+        if check_guess == true
+          update_masked_array
+          show_masked_array
+          show_guess_array
+          turns -= 1
+          puts "Excellent choice"
+        else
+          puts "incorrect" + "\n" + "\n"
+          show_guess_array
+          turns -= 1
+        end
+      end
+    end
+    puts "You win!"
+  end
+    
 end
 
 game = Hangman.new()
-game.get_guess()
+game.play()
 
 
 #masked_array = mask_keyword(keyword_length)
