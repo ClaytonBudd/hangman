@@ -2,12 +2,14 @@ word_doc = "google-10000-english-no-swears.txt"
 
 class Hangman
   def initialize() 
-  @keyword = "tittiesoboy" # temp for testing #keyword = pick_keyword(word_doc).chomp
-  @keyword_length = keyword_length(@keyword)
+  word_doc = "google-10000-english-no-swears.txt"  
+  @keyword = pick_keyword(word_doc).chomp
+  @keyword_length = @keyword.length()
   @keyword_array = @keyword.split("")
   @guess_array = []
-  @masked_array = mask_keyword()
+  @masked_array = Array.new(@keyword_length, "_")
   @guess = nil
+  @turns = 8
   end
   
   def show_turns_left()
@@ -66,10 +68,6 @@ class Hangman
   def check_guess() #double duty for keyword_array and guess_array
     @keyword_array.include?(@guess)
   end
-    
-  def mask_keyword()
-    Array.new(@keyword_length, "_")
-  end
 
   def update_masked_array()
     @keyword_array.each_with_index {|letter, index|
@@ -86,17 +84,10 @@ class Hangman
     end
   end
 
-  def lose()
-    if @turns == 0
-      true
-    end
-  end
-
   def play()
-    turns = 8
     while win == false
-      if turns == 0 
-        abort "you lose"
+      if @turns == 0 
+        abort "you lose the word was: #{@keyword}"
       else 
         show_turns_left
         show_masked_array
@@ -105,12 +96,11 @@ class Hangman
           update_masked_array
           show_masked_array
           show_guess_array
-          turns -= 1
           puts "Excellent choice"
         else
           puts "incorrect" + "\n" + "\n"
           show_guess_array
-          turns -= 1
+          @turns -= 1
         end
       end
     end
