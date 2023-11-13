@@ -7,9 +7,8 @@ class Hangman
 
   def initialize() 
     @keyword = Keyword.new.keyword
-    @keyword_array = @keyword.split("")
     @player = Player.new
-    @masked_array = Array.new(@keyword.length, "_")
+    @puzzle = "_" * @keyword.length 
     @turns = 8
   end
   
@@ -17,23 +16,23 @@ class Hangman
     puts "You have #{@turns} choices remaining" + "\n" + "\n"
   end
 
-  def show_masked_array()
-    puts "#{@masked_array}" + "\n" + "\n"
+  def show_puzzle()
+    puts "#{@puzzle}" + "\n" + "\n"
   end
 
-  def check_guess() #change to string logic
-    @keyword_array.include?(player.guess)
+  def check_guess() 
+    @keyword.include?(player.guess)
   end
 
-  def update_masked_array() #change to string logic
-    @keyword_array.each_with_index {|letter, index|
-      if letter == player.guess 
-        @masked_array[index] = letter
+  def update_puzzle() 
+    @keyword.each_char.with_index {|char, index|
+      if char == player.guess 
+        @puzzle[index] = player.guess
     end }
   end
 
   def win()
-    unless @masked_array.include?("_")
+    unless @puzzle.include?("_")
       true
     else
       false
@@ -46,11 +45,11 @@ class Hangman
         abort "you lose the word was: #{@keyword}"
       else 
         show_turns_left
-        show_masked_array
+        show_puzzle
         player.get_guess
         if check_guess == true #
-          update_masked_array
-          show_masked_array
+          update_puzzle
+          show_puzzle
           player.show_guess_array
           puts "Excellent choice"
         else
