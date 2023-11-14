@@ -6,6 +6,7 @@ require          'yaml'
 
 class Hangman 
   attr_accessor :keyword, :player, :turns, :puzzle
+  include Serialize
 
   def initialize() 
     @keyword = Keyword.new.keyword
@@ -69,25 +70,6 @@ class Hangman
     puts "You win!"
   end
 
-  def to_yaml 
-    YAML.dump ({
-      :keyword => @keyword,
-      :puzzle => @puzzle,
-      :turns => @turns,
-      :guess => player.guess,
-      :guess_array => player.guess_array
-    })
-  end
-
-  def self_from_yaml(yaml)
-    data = YAML.load yaml
-    puts "\n" + "Game loaded: " + "\n"
-    @keyword = data[:keyword]
-    @puzzle =  data[:puzzle] 
-    @turns =   data[:turns]
-    @guess_array = data[:guess_array]
-  end
-
   def save_directory
     if Dir.exist?('save') == false
       Dir.mkdir("save")
@@ -98,7 +80,6 @@ class Hangman
     print "Please enter a save name no spaces: "
     save_name = gets.chomp
     serialized_data = to_yaml
-    puts serialized_data
     save_directory
     if !File.exist?("save/save_name")
       File.write("save/#{save_name}", serialized_data)

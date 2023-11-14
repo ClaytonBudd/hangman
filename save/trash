@@ -1,0 +1,12 @@
+--- !ruby/object:Hangman
+keyword: featuring
+player: !ruby/object:Player
+  guess: save
+  guess_array:
+  - f
+  - u
+  - c
+  - k
+  - "y"
+puzzle: f___u____
+turns: 5
