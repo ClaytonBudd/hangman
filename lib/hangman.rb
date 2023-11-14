@@ -1,15 +1,18 @@
 require_relative 'keyword'
 require_relative 'player'
+require_relative 'serialize'
+require          'yaml'
 
 
-class Hangman
-  attr_accessor :keyword, :player
+class Hangman 
+  attr_accessor :keyword, :player, :turns, :puzzle
 
   def initialize() 
     @keyword = Keyword.new.keyword
     @player = Player.new
-    @puzzle = "_" * @keyword.length 
+    @puzzle = "_" * keyword.length 
     @turns = 8
+    start_menu
   end
   
   def show_turns_left()
@@ -21,14 +24,14 @@ class Hangman
   end
 
   def check_guess() 
-    @keyword.include?(player.guess)
+    keyword.include?(player.guess)
   end
 
   def update_puzzle() 
-    @keyword.each_char.with_index {|char, index|
+     keyword.each_char.with_index {|char, index|
       if char == player.guess 
         @puzzle[index] = player.guess
-    end }
+      end }
   end
 
   def win()
@@ -46,25 +49,89 @@ class Hangman
       else 
         show_turns_left
         show_puzzle
-        player.get_guess
-        if check_guess == true #
-          update_puzzle
-          show_puzzle
-          player.show_guess_array
-          puts "Excellent choice"
+        guess = player.get_guess
+        if guess == 'save'
+          save_game
         else
-          puts "incorrect" + "\n" 
-          player.show_guess_array
-          @turns -= 1
+          if check_guess == true
+            update_puzzle
+            show_puzzle
+            player.show_guess_array
+            puts "Excellent choice"
+          else
+            puts "incorrect" + "\n" 
+            player.show_guess_array
+            @turns -= 1
+          end
         end
       end
     end
     puts "You win!"
   end
-    
+
+  def to_yaml 
+    YAML.dump ({
+      :keyword => @keyword,
+      :puzzle => @puzzle,
+      :turns => @turns,
+      :guess => player.guess,
+      :guess_array => player.guess_array
+    })
+  end
+
+  def self_from_yaml(yaml)
+    data = YAML.load yaml
+    puts "\n" + "Game loaded: " + "\n"
+    @keyword = data[:keyword]
+    @puzzle =  data[:puzzle] 
+    @turns =   data[:turns]
+    @guess_array = data[:guess_array]
+  end
+
+  def save_directory
+    if Dir.exist?('save') == false
+      Dir.mkdir("save")
+    end
+  end
+
+  def save_game
+    print "Please enter a save name no spaces: "
+    save_name = gets.chomp
+    serialized_data = to_yaml
+    puts serialized_data
+    save_directory
+    if !File.exist?("save/save_name")
+      File.write("save/#{save_name}", serialized_data)
+      puts "Game saved."
+    end
+  end
+
+  def load_game
+    puts Dir.entries("save")
+    print "Please enter game you would like to load: "
+    load_name = gets.chomp
+    game_file = File.read("save/#{load_name}")
+    game = self_from_yaml(game_file)
+    play
+  end
+
+  def start_menu
+      print "Please enter 1 for new game or 2 to load saved game: "
+      selection = gets.chomp 
+      while selection != "1" && selection != "2"
+        "invalid selection"
+        start_menu
+      end
+      if selection == "1"
+        play
+      elsif selection == "2"
+        load_game 
+      end
+  end
 end
 
-game = Hangman.new()
-game.play()
+game = Hangman.new
+game.start_menu
+
 
 
